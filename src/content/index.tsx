@@ -137,10 +137,7 @@ const RenderLoop = () => {
 
     return (
         <div style={{ pointerEvents: 'auto', position: 'absolute', top: selection.y, left: selection.x }}>
-            {/* Fallback visual to confirm injection if Tailwind fails */}
-            <div style={{ border: '1px solid magenta' }}>
-                <Tooltip selectedText={selection.text} onTransform={handleTransform} />
-            </div>
+            <Tooltip selectedText={selection.text} onTransform={handleTransform} />
         </div>
     );
 }
