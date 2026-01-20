@@ -42,6 +42,16 @@ const Tooltip: React.FC<TooltipProps> = ({ onTransform, selectedText }) => {
             >
                 𝑖
             </button>
+
+            <div className="w-px h-6 bg-slate-600 mx-1"></div>
+
+            <button
+                onClick={() => handleStyleClick('boldSans')}
+                className="p-2 hover:bg-slate-700 rounded transition-colors text-lg w-8 h-8 flex items-center justify-center font-bold"
+                title="Bold Sans"
+            >
+                𝗕
+            </button>
             <button
                 onClick={() => handleStyleClick('boldScript')}
                 className="p-2 hover:bg-slate-700 rounded transition-colors text-lg w-8 h-8 flex items-center justify-center"
@@ -52,6 +62,20 @@ const Tooltip: React.FC<TooltipProps> = ({ onTransform, selectedText }) => {
 
             <div className="w-px h-6 bg-slate-600 mx-1"></div>
 
+            <button
+                onClick={() => handleStyleClick('smallCaps')}
+                className="p-2 hover:bg-slate-700 rounded transition-colors text-sm w-8 h-8 flex items-center justify-center font-bold"
+                title="Small Caps"
+            >
+                ᴄ
+            </button>
+            <button
+                onClick={() => handleStyleClick('squared')}
+                className="p-2 hover:bg-slate-700 rounded transition-colors text-sm w-8 h-8 flex items-center justify-center"
+                title="Squared"
+            >
+                🅰
+            </button>
             <button
                 onClick={() => handleStyleClick('circles')}
                 className="p-2 hover:bg-slate-700 rounded transition-colors text-sm w-8 h-8 flex items-center justify-center"
