@@ -31,9 +31,22 @@ const MAPS: Record<StyleType, Record<string, string>> = {
     }
 };
 
-export const transformText = (text: string, style: StyleType): string => {
-    const map = MAPS[style];
-    if (!map) return text;
+const REVERSE_MAP: Record<string, string> = {};
+// Initialize Reverse Map
+Object.values(MAPS).forEach(map => {
+    Object.entries(map).forEach(([char, styledChar]) => {
+        REVERSE_MAP[styledChar] = char;
+    });
+});
 
-    return text.split('').map(char => map[char] || char).join('');
+export const normalizeText = (text: string): string => {
+    return [...text].map(char => REVERSE_MAP[char] || char).join('');
+}
+
+export const transformText = (text: string, style: StyleType): string => {
+    const normalized = normalizeText(text);
+    const map = MAPS[style];
+    if (!map) return normalized;
+
+    return [...normalized].map(char => map[char] || char).join('');
 }

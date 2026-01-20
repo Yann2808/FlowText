@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { transformText, type StyleType } from '../logic/unicode';
+import { transformText, normalizeText, type StyleType } from '../logic/unicode';
 
 interface TooltipProps {
     onTransform: (newText: string) => void;
@@ -10,8 +10,18 @@ const Tooltip: React.FC<TooltipProps> = ({ onTransform, selectedText }) => {
     const [isOpen] = useState(true); // Always open when mounted initially
 
     const handleStyleClick = (style: StyleType) => {
+        // 1. Transform the text (transformText now handles normalization internally)
         const transformed = transformText(selectedText, style);
-        onTransform(transformed);
+
+        // 2. Toggle Logic:
+        // If the output is identical to input, it implies the text was ALREADY in this style
+        // (since transformText(alreadyStyled, style) == alreadyStyled).
+        // In this case, the user likely wants to revert to normal text.
+        if (transformed === selectedText) {
+            onTransform(normalizeText(selectedText));
+        } else {
+            onTransform(transformed);
+        }
     };
 
     if (!isOpen) return null;
