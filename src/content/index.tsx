@@ -13,7 +13,7 @@ const mount = () => {
     const host = document.createElement('div');
     host.id = CONTAINER_ID;
     host.style.position = 'absolute';
-    host.style.zIndex = '9999';
+    host.style.zIndex = '2147483647';
     host.style.top = '0';
     host.style.left = '0';
     host.style.pointerEvents = 'none';
@@ -44,18 +44,26 @@ const RenderLoop = () => {
                 const range = sel.getRangeAt(0);
                 const rect = range.getBoundingClientRect();
 
+                // Debug logs
+                console.log('[FlowText] Selection detected:', sel.toString());
+
                 // Important: Verify we are in a contenteditable or input
                 let node = range.commonAncestorContainer;
                 // traverse up to find contenteditable
                 let isEditable = false;
-                while (node) {
-                    if (node instanceof HTMLElement && node.isContentEditable) {
+                let current: Node | null = node;
+                while (current) {
+                    if (current instanceof HTMLElement && (current.isContentEditable || current.getAttribute('contenteditable') === 'true')) {
                         isEditable = true;
                         break;
                     }
-                    node = node.parentNode!;
+                    current = current.parentNode;
                 }
 
+                console.log('[FlowText] Is Editable?', isEditable);
+
+                // RELAXED CHECK FOR DEBUG: Show on any selection if specific check fails, or just log.
+                // For now, let's keep it strict but log.
                 if (isEditable) {
                     setSelection({
                         text: sel.toString(),
@@ -79,11 +87,19 @@ const RenderLoop = () => {
             }
         };
 
+        const handleKeyUp = (e: KeyboardEvent) => {
+            if (e.key === 'Shift' || e.key.startsWith('Arrow')) {
+                setTimeout(handleMouseUp, 100); // Small delay to let selection update
+            }
+        }
+
         document.addEventListener('mouseup', handleMouseUp);
+        document.addEventListener('keyup', handleKeyUp);
         document.addEventListener('selectionchange', handleSelectionChange);
 
         return () => {
             document.removeEventListener('mouseup', handleMouseUp);
+            document.removeEventListener('keyup', handleKeyUp);
             document.removeEventListener('selectionchange', handleSelectionChange);
         };
     }, []);
@@ -121,7 +137,10 @@ const RenderLoop = () => {
 
     return (
         <div style={{ pointerEvents: 'auto', position: 'absolute', top: selection.y, left: selection.x }}>
-            <Tooltip selectedText={selection.text} onTransform={handleTransform} />
+            {/* Fallback visual to confirm injection if Tailwind fails */}
+            <div style={{ border: '1px solid magenta' }}>
+                <Tooltip selectedText={selection.text} onTransform={handleTransform} />
+            </div>
         </div>
     );
 }
