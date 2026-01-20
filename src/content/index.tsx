@@ -44,9 +44,6 @@ const RenderLoop = () => {
                 const range = sel.getRangeAt(0);
                 const rect = range.getBoundingClientRect();
 
-                // Debug logs
-                console.log('[FlowText] Selection detected:', sel.toString());
-
                 // Important: Verify we are in a contenteditable or input
                 let node = range.commonAncestorContainer;
                 // traverse up to find contenteditable
@@ -60,10 +57,6 @@ const RenderLoop = () => {
                     current = current.parentNode;
                 }
 
-                console.log('[FlowText] Is Editable?', isEditable);
-
-                // RELAXED CHECK FOR DEBUG: Show on any selection if specific check fails, or just log.
-                // For now, let's keep it strict but log.
                 if (isEditable) {
                     setSelection({
                         text: sel.toString(),
