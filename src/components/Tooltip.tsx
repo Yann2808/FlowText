@@ -17,14 +17,20 @@ const Tooltip: React.FC<TooltipProps> = ({ onTransform, selectedText }) => {
     };
 
     const handleStyleClick = (style: StyleType) => {
+        console.log('[Tooltip] Style clicked:', style);
         const isActive = isStyleActive(style);
+        console.log('[Tooltip] Is active?', isActive);
 
         if (isActive) {
             // Toggle off: revert to normal
-            onTransform(normalizeText(selectedText));
+            const normalized = normalizeText(selectedText);
+            console.log('[Tooltip] Normalizing:', normalized);
+            onTransform(normalized);
         } else {
             // Apply style
-            onTransform(transformText(selectedText, style));
+            const transformed = transformText(selectedText, style);
+            console.log('[Tooltip] Transforming to:', transformed);
+            onTransform(transformed);
         }
     };
 
@@ -32,8 +38,12 @@ const Tooltip: React.FC<TooltipProps> = ({ onTransform, selectedText }) => {
         const active = isStyleActive(style);
         return (
             <button
-                onMouseDown={(e) => e.preventDefault()} // Critical: Prevents focus loss from the text editor
-                onClick={() => handleStyleClick(style)}
+                onMouseDown={(e) => {
+                    console.log('[Tooltip] Button MouseDown (React). Executing logic...');
+                    e.preventDefault(); // Prevent focus loss
+                    console.log('[Tooltip] Calling handleStyleClick...');
+                    handleStyleClick(style);
+                }}
                 className={`
           flex items-center justify-center w-9 h-9 rounded-md transition-all duration-200
           ${active
