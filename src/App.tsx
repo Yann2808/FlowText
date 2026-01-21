@@ -5,19 +5,16 @@ function App() {
   const [text, setText] = useState('FlowText makes your LinkedIn posts stand out.');
   const [copied, setCopied] = useState(false);
 
-  const applyStyle = (style: StyleType) => {
-    // Logic similar to Tooltip
-    // Convert current to normal first to avoid double styling issues if user clicks multiple
-    const normal = normalizeText(text);
-    const styled = transformText(normal, style);
+  const isStyleActive = (style: StyleType) => {
+    return text && transformText(text, style) === text;
+  };
 
-    // If result is same (toggle off), revert to normal
-    // But since we normalized first, 'styled' will be styled version of normal.
-    // If current 'text' is ALREADY that style, we want to revert.
-    if (styled === text) {
-      setText(normal);
+  const applyStyle = (style: StyleType) => {
+    const isActive = isStyleActive(style);
+    if (isActive) {
+      setText(normalizeText(text));
     } else {
-      setText(styled);
+      setText(transformText(text, style));
     }
   };
 
@@ -25,6 +22,26 @@ function App() {
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const DemoButton = ({ style, icon, title, isTextIcon = false }: { style: StyleType, icon: string, title: string, isTextIcon?: boolean }) => {
+    const active = isStyleActive(style);
+    return (
+      <button
+        onClick={() => applyStyle(style)}
+        title={title}
+        className={`
+          flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200
+          ${active
+            ? 'bg-indigo-500 text-white shadow-lg scale-105'
+            : 'text-slate-300 hover:bg-slate-700 hover:text-white hover:scale-105 active:scale-95'
+          }
+          ${isTextIcon ? 'text-sm font-bold tracking-widest' : 'text-xl'}
+        `}
+      >
+        {icon}
+      </button>
+    );
   };
 
   return (
@@ -68,17 +85,27 @@ function App() {
           <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-indigo-500/20 rounded-full blur-3xl group-hover:bg-indigo-500/30 transition-all duration-500"></div>
 
           {/* Tooltip Simulation */}
-          <div className="flex items-center justify-center gap-3 mb-6 bg-slate-900/80 p-2 rounded-xl inline-flex border border-slate-700/50 shadow-lg">
-            {/* Reusing Styles Logic */}
-            <DemoButton onClick={() => applyStyle('boldSerif')} title="Bold Serif">𝐁</DemoButton>
-            <DemoButton onClick={() => applyStyle('italicSerif')} title="Italic Serif">𝑖</DemoButton>
-            <div className="w-px h-6 bg-slate-700 mx-1"></div>
-            <DemoButton onClick={() => applyStyle('boldSans')} title="Bold Sans">𝗕</DemoButton>
-            <DemoButton onClick={() => applyStyle('boldScript')} title="Bold Script">𝓑</DemoButton>
-            <div className="w-px h-6 bg-slate-700 mx-1"></div>
-            <DemoButton onClick={() => applyStyle('smallCaps')} title="Small Caps" small>ᴄ</DemoButton>
-            <DemoButton onClick={() => applyStyle('squared')} title="Squared" small>🅰</DemoButton>
-            <DemoButton onClick={() => applyStyle('circles')} title="Circles" small>ⓐ</DemoButton>
+          <div className="flex items-center justify-center gap-1.5 mb-6 bg-slate-900/90 p-2 rounded-xl inline-flex border border-slate-700/50 shadow-lg backdrop-blur-md">
+
+            {/* Group 1 */}
+            <DemoButton style="boldSans" icon="𝗕" title="Bold Sans" />
+            <DemoButton style="boldSerif" icon="𝐁" title="Bold Serif" />
+            <DemoButton style="italicSerif" icon="𝑖" title="Italic Serif" />
+
+            <div className="w-px h-6 bg-slate-700 mx-2 opacity-50"></div>
+
+            {/* Group 2 */}
+            <DemoButton style="smallCaps" icon="ᴀʙ" title="Small Caps" isTextIcon />
+            <DemoButton style="boldScript" icon="𝒮" title="Script" />
+            <DemoButton style="squared" icon="🅰" title="Squared" />
+            <DemoButton style="circles" icon="Ⓐ" title="Circles" />
+
+            <div className="w-px h-6 bg-slate-700 mx-2 opacity-50"></div>
+
+            {/* More */}
+            <button className="flex items-center justify-center w-10 h-10 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors">
+              <span className="mb-2">...</span>
+            </button>
           </div>
 
           <textarea
@@ -117,19 +144,5 @@ function App() {
     </div>
   )
 }
-
-const DemoButton = ({ children, onClick, title, small }: { children: React.ReactNode, onClick: () => void, title: string, small?: boolean }) => (
-  <button
-    onClick={onClick}
-    title={title}
-    className={`
-      hover:bg-slate-700 rounded-lg transition-all duration-200 
-      flex items-center justify-center text-slate-200 hover:text-white hover:scale-110 active:scale-95
-      ${small ? 'w-8 h-8 text-sm' : 'w-10 h-10 text-xl'}
-    `}
-  >
-    {children}
-  </button>
-);
 
 export default App

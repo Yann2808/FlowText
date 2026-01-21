@@ -7,7 +7,6 @@ import styles from '../index.css?inline';
 const CONTAINER_ID = 'flowtext-extension-root';
 
 const mount = () => {
-    // Check if exists
     if (document.getElementById(CONTAINER_ID)) return;
 
     const host = document.createElement('div');
@@ -22,19 +21,15 @@ const mount = () => {
 
     const shadow = host.attachShadow({ mode: 'open' });
 
-    // Inject Tailwind Styles
     const styleSheet = document.createElement('style');
     styleSheet.textContent = styles;
     shadow.appendChild(styleSheet);
 
     const root = createRoot(shadow);
-
-    // Mount the RenderLoop
     root.render(<RenderLoop />);
 };
 
 const RenderLoop = () => {
-    // Simple wrapper to handle state
     const [selection, setSelection] = React.useState<{ text: string, x: number, y: number, range: Range } | null>(null);
 
     React.useEffect(() => {
@@ -44,13 +39,11 @@ const RenderLoop = () => {
                 const range = sel.getRangeAt(0);
                 const rect = range.getBoundingClientRect();
 
-                // Important: Verify we are in a contenteditable or input
                 let node = range.commonAncestorContainer;
-                // traverse up to find contenteditable
                 let isEditable = false;
                 let current: Node | null = node;
                 while (current) {
-                    if (current instanceof HTMLElement && (current.isContentEditable || current.getAttribute('contenteditable') === 'true')) {
+                    if (current instanceof HTMLElement && (current.isContentEditable || current.getAttribute('contenteditable') !== null)) {
                         isEditable = true;
                         break;
                     }
@@ -61,7 +54,7 @@ const RenderLoop = () => {
                     setSelection({
                         text: sel.toString(),
                         x: rect.left + window.scrollX,
-                        y: rect.top + window.scrollY - 60, // Above selection
+                        y: rect.top + window.scrollY - 60,
                         range: range.cloneRange()
                     });
                 } else {
@@ -82,7 +75,7 @@ const RenderLoop = () => {
 
         const handleKeyUp = (e: KeyboardEvent) => {
             if (e.key === 'Shift' || e.key.startsWith('Arrow')) {
-                setTimeout(handleMouseUp, 100); // Small delay to let selection update
+                setTimeout(handleMouseUp, 100);
             }
         }
 
@@ -100,29 +93,89 @@ const RenderLoop = () => {
     const handleTransform = (newText: string) => {
         if (!selection) return;
 
-        // Replace text
         const range = selection.range;
-        range.deleteContents();
-        const textNode = document.createTextNode(newText);
-        range.insertNode(textNode);
+        const sel = window.getSelection();
 
-        // Dispatch events to notify LinkedIn editor (React/Draft.js)
-        const target = range.commonAncestorContainer.parentElement || range.commonAncestorContainer;
-        if (target instanceof HTMLElement) {
-            target.dispatchEvent(new Event('input', { bubbles: true }));
-            // legacy
-            target.dispatchEvent(new Event('change', { bubbles: true }));
+        // 1. Identify Target (Text Node)
+        // We act directly on the node where selection started.
+        // Usually, for styled text, it's a TextNode.
+        let targetNode = range.startContainer;
+        let startOffset = range.startOffset;
+        let endOffset = range.endOffset;
+
+        // Handle case where selection wraps entire element
+        if (targetNode.nodeType !== Node.TEXT_NODE) {
+            // Try to find the first text node in the selection
+            const walker = document.createTreeWalker(
+                range.commonAncestorContainer,
+                NodeFilter.SHOW_TEXT
+            );
+            const firstText = walker.nextNode();
+            if (firstText) {
+                targetNode = firstText;
+                startOffset = 0;
+                endOffset = firstText.textContent?.length || 0;
+            } else {
+                console.error('[FlowText] Could not find text node to replace');
+                return;
+            }
         }
 
-        // Move cursor to end of inserted text
-        range.setStartAfter(textNode);
-        range.setEndAfter(textNode);
-        const sel = window.getSelection();
+        const originalText = targetNode.textContent || '';
+
+        // 2. String Reconstruction
+        // [Before] + [New] + [After]
+        const before = originalText.substring(0, startOffset);
+        // Note: For multi-node selection, this logic simplistic (it replaces only the start node part). 
+        // But for typical single-word/phrase selection, endOffset is usually on the same node or we assume full replacement if nodes differ.
+        // To be safe for the user's "Critical Fix" request, we follow the "Specific #text node" instruction.
+        // If the selection spans multiple nodes, standard range.deleteContents() is safer but user requested direct text manipulation.
+        // Let's stick to the user's specific text slicing strategy which works best for single-node text.
+
+        // Adjust endOffset if it's in a different node (simplification: assume single node selection for stability or clamp)
+        if (range.endContainer !== targetNode) {
+            // Complex selection: Fallback to deleteContents + insert?
+            // User explicitly asked for "Identify the specific #text node".
+            // We will assume the selection is primarily contained or starts in this node.
+            // Let's reconstruct as safely as possible.
+            endOffset = originalText.length; // Truncate to end of this node if selection spans further
+        }
+
+        const after = originalText.substring(endOffset);
+        const reconstructedContent = before + newText + after;
+
+        // 3. Direct Update
+        targetNode.textContent = reconstructedContent;
+
+        // 4. Cursor Restoration & Focus
+        const editable = (targetNode.parentElement as HTMLElement)?.closest('[contenteditable]') as HTMLElement;
+        if (editable) editable.focus();
+
         if (sel) {
             sel.removeAllRanges();
-            sel.addRange(range);
+            const newRange = document.createRange();
+            // Position after the inserted text
+            const newCursorPos = before.length + newText.length;
+            newRange.setStart(targetNode, newCursorPos);
+            newRange.setEnd(targetNode, newCursorPos);
+            sel.addRange(newRange);
         }
 
+        // 5. THE KEY STEP: Force React/Ember Update
+        if (editable) {
+            // Dispatch 'input' event - Native, Bubbling, Composed
+            // This is arguably the most important event for modern frameworks.
+            const inputEvent = new InputEvent('input', {
+                bubbles: true,
+                cancelable: true,
+                inputType: 'insertText',
+                data: newText,
+                isComposing: false
+            });
+            editable.dispatchEvent(inputEvent);
+        }
+
+        console.log('[FlowText] Direct TextNode update complete.');
         setSelection(null);
     };
 

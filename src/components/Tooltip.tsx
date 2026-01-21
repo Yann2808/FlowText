@@ -7,82 +7,80 @@ interface TooltipProps {
 }
 
 const Tooltip: React.FC<TooltipProps> = ({ onTransform, selectedText }) => {
-    const [isOpen] = useState(true); // Always open when mounted initially
+    const [isOpen] = useState(true);
+
+    // Check which style is active
+    // If transforming the already selected text results in the exact same string,
+    // it implies the text is already in that style.
+    const isStyleActive = (style: StyleType) => {
+        return selectedText && transformText(selectedText, style) === selectedText;
+    };
 
     const handleStyleClick = (style: StyleType) => {
-        // 1. Transform the text (transformText now handles normalization internally)
-        const transformed = transformText(selectedText, style);
+        const isActive = isStyleActive(style);
 
-        // 2. Toggle Logic:
-        // If the output is identical to input, it implies the text was ALREADY in this style
-        // (since transformText(alreadyStyled, style) == alreadyStyled).
-        // In this case, the user likely wants to revert to normal text.
-        if (transformed === selectedText) {
+        if (isActive) {
+            // Toggle off: revert to normal
             onTransform(normalizeText(selectedText));
         } else {
-            onTransform(transformed);
+            // Apply style
+            onTransform(transformText(selectedText, style));
         }
+    };
+
+    const Button = ({ style, icon, title, isTextIcon = false }: { style: StyleType, icon: string, title: string, isTextIcon?: boolean }) => {
+        const active = isStyleActive(style);
+        return (
+            <button
+                onMouseDown={(e) => e.preventDefault()} // Critical: Prevents focus loss from the text editor
+                onClick={() => handleStyleClick(style)}
+                className={`
+          flex items-center justify-center w-9 h-9 rounded-md transition-all duration-200
+          ${active
+                        ? 'bg-indigo-500 text-white shadow-md'
+                        : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                    }
+          ${isTextIcon ? 'text-xs font-bold tracking-widest' : 'text-xl'}
+        `}
+                title={title}
+            >
+                {icon}
+            </button>
+        );
     };
 
     if (!isOpen) return null;
 
     return (
-        <div className="flex items-center gap-2 bg-slate-800 text-white p-2 rounded-lg shadow-xl border border-slate-700 animate-in fade-in zoom-in duration-200">
+        <div className="flex items-center gap-1.5 bg-slate-900 text-white p-2 rounded-xl shadow-2xl border border-slate-700/50 animate-in fade-in zoom-in duration-200 backdrop-blur-sm">
+
+            {/* Group 1: Standard Formatting */}
+            <div className="flex items-center gap-1">
+                <Button style="boldSans" icon="𝗕" title="Bold Sans" />
+                <Button style="boldSerif" icon="𝐁" title="Bold Serif" />
+                <Button style="italicSerif" icon="𝑖" title="Italic Serif" />
+            </div>
+
+            <div className="w-px h-6 bg-slate-700 mx-1 opacity-50"></div>
+
+            {/* Group 2: Special Styles */}
+            <div className="flex items-center gap-1">
+                <Button style="smallCaps" icon="ᴀʙ" title="Small Caps" isTextIcon />
+                <Button style="boldScript" icon="𝒮" title="Script" />
+                <Button style="squared" icon="🅰" title="Squared" />
+                <Button style="circles" icon="Ⓐ" title="Circles" />
+            </div>
+
+            <div className="w-px h-6 bg-slate-700 mx-1 opacity-50"></div>
+
+            {/* Group 3: More (Placeholder for now) */}
             <button
-                onClick={() => handleStyleClick('boldSerif')}
-                className="p-2 hover:bg-slate-700 rounded transition-colors font-serif font-bold text-lg w-8 h-8 flex items-center justify-center"
-                title="Bold Serif"
+                onMouseDown={(e) => e.preventDefault()}
+                className="flex items-center justify-center w-9 h-9 text-slate-400 hover:text-white hover:bg-slate-700 rounded-md transition-colors"
             >
-                𝐁
-            </button>
-            <button
-                onClick={() => handleStyleClick('italicSerif')}
-                className="p-2 hover:bg-slate-700 rounded transition-colors font-serif italic text-lg w-8 h-8 flex items-center justify-center"
-                title="Italic Serif"
-            >
-                𝑖
+                <span className="mb-2 text-xl leading-none">...</span>
             </button>
 
-            <div className="w-px h-6 bg-slate-600 mx-1"></div>
-
-            <button
-                onClick={() => handleStyleClick('boldSans')}
-                className="p-2 hover:bg-slate-700 rounded transition-colors text-lg w-8 h-8 flex items-center justify-center font-bold"
-                title="Bold Sans"
-            >
-                𝗕
-            </button>
-            <button
-                onClick={() => handleStyleClick('boldScript')}
-                className="p-2 hover:bg-slate-700 rounded transition-colors text-lg w-8 h-8 flex items-center justify-center"
-                title="Bold Script"
-            >
-                𝓑
-            </button>
-
-            <div className="w-px h-6 bg-slate-600 mx-1"></div>
-
-            <button
-                onClick={() => handleStyleClick('smallCaps')}
-                className="p-2 hover:bg-slate-700 rounded transition-colors text-sm w-8 h-8 flex items-center justify-center font-bold"
-                title="Small Caps"
-            >
-                ᴄ
-            </button>
-            <button
-                onClick={() => handleStyleClick('squared')}
-                className="p-2 hover:bg-slate-700 rounded transition-colors text-sm w-8 h-8 flex items-center justify-center"
-                title="Squared"
-            >
-                🅰
-            </button>
-            <button
-                onClick={() => handleStyleClick('circles')}
-                className="p-2 hover:bg-slate-700 rounded transition-colors text-sm w-8 h-8 flex items-center justify-center"
-                title="Circles"
-            >
-                ⓐ
-            </button>
         </div>
     );
 };

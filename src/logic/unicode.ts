@@ -59,12 +59,9 @@ Object.values(MAPS).forEach(map => {
         REVERSE_MAP[styledChar] = char;
     });
 });
-console.log('[FlowText] Maps initialized. Reverse Map size:', Object.keys(REVERSE_MAP).length);
 
 export const normalizeText = (text: string): string => {
-    const res = [...text].map(char => REVERSE_MAP[char] || char).join('');
-    console.log(`[FlowText] Normalize: "${text}" -> "${res}"`);
-    return res;
+    return [...text].map(char => REVERSE_MAP[char] || char).join('');
 }
 
 export const transformText = (text: string, style: StyleType): string => {

@@ -35,6 +35,26 @@ const testLogic = () => {
         console.log('Transform result:', transformText(bold, 'boldSerif'));
     }
 
+    // 6. New Styles Tests
+    const newStyles = ['boldScript', 'circles', 'boldSans', 'smallCaps', 'squared'] as const;
+    console.log('--- NEW STYLES TESTS ---');
+
+    newStyles.forEach(style => {
+        const transformed = transformText(original, style);
+        const normalized = normalizeText(transformed);
+
+        let isValid = normalized === original;
+        // SmallCaps and Squared are lossy (map to uppercase-like glyphs only)
+        if (style === 'smallCaps' || style === 'squared') {
+            isValid = normalized.toUpperCase() === original.toUpperCase();
+        }
+
+        console.log(`Style: ${style}`);
+        console.log(`  Output: ${transformed}`);
+        console.log(`  Normalized: ${normalized}`);
+        console.log(`  Valid: ${isValid}`);
+    });
+
     console.log('--- TEST END ---');
 };
 
