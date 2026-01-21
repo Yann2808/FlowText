@@ -62,7 +62,7 @@ const RenderLoop = () => {
                     setSelection({
                         text: sel.toString(),
                         x: rect.left,
-                        y: rect.top - 60,
+                        y: rect.top - 45,
                         range: range.cloneRange()
                     });
                 } else {
