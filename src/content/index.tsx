@@ -5,7 +5,6 @@ import Tooltip from '../components/Tooltip';
 import styles from '../index.css?inline';
 
 const CONTAINER_ID = 'flowtext-extension-root';
-console.log('[FlowText] Content script loaded from src/content/index.tsx');
 
 const mount = () => {
     if (document.getElementById(CONTAINER_ID)) return;
@@ -27,14 +26,6 @@ const mount = () => {
     const styleSheet = document.createElement('style');
     styleSheet.textContent = styles;
     shadow.appendChild(styleSheet);
-
-    // DEBUG: Raw Event Listeners
-    shadow.addEventListener('click', (e) => {
-        console.log('[FlowText] RAW Shadow Root Click on:', e.target);
-    });
-    shadow.addEventListener('mousedown', (e) => {
-        console.log('[FlowText] RAW Shadow Root MouseDown on:', e.target);
-    });
 
     const root = createRoot(shadow);
     root.render(<RenderLoop />);

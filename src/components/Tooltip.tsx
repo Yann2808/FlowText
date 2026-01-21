@@ -17,20 +17,14 @@ const Tooltip: React.FC<TooltipProps> = ({ onTransform, selectedText }) => {
     };
 
     const handleStyleClick = (style: StyleType) => {
-        console.log('[Tooltip] Style clicked:', style);
         const isActive = isStyleActive(style);
-        console.log('[Tooltip] Is active?', isActive);
 
         if (isActive) {
             // Toggle off: revert to normal
-            const normalized = normalizeText(selectedText);
-            console.log('[Tooltip] Normalizing:', normalized);
-            onTransform(normalized);
+            onTransform(normalizeText(selectedText));
         } else {
             // Apply style
-            const transformed = transformText(selectedText, style);
-            console.log('[Tooltip] Transforming to:', transformed);
-            onTransform(transformed);
+            onTransform(transformText(selectedText, style));
         }
     };
 
@@ -39,9 +33,7 @@ const Tooltip: React.FC<TooltipProps> = ({ onTransform, selectedText }) => {
         return (
             <button
                 onMouseDown={(e) => {
-                    console.log('[Tooltip] Button MouseDown (React). Executing logic...');
-                    e.preventDefault(); // Prevent focus loss
-                    console.log('[Tooltip] Calling handleStyleClick...');
+                    e.preventDefault();
                     handleStyleClick(style);
                 }}
                 className={`
