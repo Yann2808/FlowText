@@ -70,7 +70,7 @@ const Tooltip: React.FC<TooltipProps> = ({ onTransform, selectedText }) => {
                     e.preventDefault();
                     setIsExpanded(true);
                 }}
-                className="flex items-center justify-center w-12 h-12 bg-slate-900 text-indigo-400 rounded-full shadow-xl border border-slate-700/50 hover:bg-slate-800 hover:scale-110 hover:text-indigo-300 transition-all duration-200 animate-in fade-in zoom-in cursor-pointer"
+                className="flex items-center justify-center w-14 h-14 bg-slate-900 text-indigo-400 rounded-full shadow-xl border border-slate-700/50 hover:bg-slate-800 hover:scale-110 hover:text-indigo-300 transition-all duration-200 animate-in fade-in zoom-in cursor-pointer"
                 title="Open FlowText"
             >
                 <SparklesIcon />
