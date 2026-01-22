@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { transformText, normalizeText, type StyleType } from './logic/unicode';
+import { Download, Chrome, Github, CheckCircle2 } from 'lucide-react';
 
 function App() {
   const [text, setText] = useState('FlowText makes your LinkedIn posts stand out.');
@@ -50,12 +51,14 @@ function App() {
       <nav className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
+            <img src="/flowtext-logo.png" alt="FlowText Logo" className="w-8 h-8 rounded-lg" />
             <span className="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">FlowText</span>
           </div>
           <a
-            href="https://github.com/your-repo/flowtext"
-            className="px-4 py-2 rounded-full bg-slate-800 hover:bg-slate-700 transition-colors text-sm font-medium"
+            href="https://github.com/Yann2808/flowtext"
+            className="px-4 py-2 rounded-full bg-slate-800 hover:bg-slate-700 transition-colors text-sm font-medium flex items-center gap-2"
           >
+            <Github className="w-4 h-4" />
             GitHub
           </a>
         </div>
@@ -64,7 +67,7 @@ function App() {
       {/* Hero Section */}
       <main className="max-w-4xl mx-auto px-6 pt-20 pb-32 text-center">
         <div className="inline-block mb-4 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-sm font-medium">
-          🚀 Now available for Chrome & Edge
+          🚀 v1.0 Released on GitHub
         </div>
 
         <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8">
@@ -78,6 +81,39 @@ function App() {
           <span className="font-serif italic text-slate-200 mx-1">Italic</span>, and
           <span className="text-slate-200 mx-1">𝓢𝓬𝓻𝓲𝓹𝓽</span> directly in the editor.
         </p>
+
+        {/* Installation Guide */}
+        <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-8 mb-16 text-left max-w-2xl mx-auto backdrop-blur-sm relative overflow-hidden group hover:border-indigo-500/30 transition-colors">
+          <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+            <Chrome className="w-6 h-6 text-indigo-400" />
+            How to Install (Developer Mode)
+          </h3>
+
+          <div className="space-y-4">
+            <div className="flex items-start gap-4">
+              <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-indigo-400 font-bold shrink-0">1</div>
+              <div>
+                <p className="text-slate-300 font-medium">Download v1.0</p>
+                <p className="text-sm text-slate-500">Get the zip file from our GitHub Release.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4">
+              <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-indigo-400 font-bold shrink-0">2</div>
+              <div>
+                <p className="text-slate-300 font-medium">Unzip the file</p>
+                <p className="text-sm text-slate-500">Extract the folder to a safe location.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4">
+              <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-indigo-400 font-bold shrink-0">3</div>
+              <div>
+                <p className="text-slate-300 font-medium">Load in Chrome</p>
+                <p className="text-sm text-slate-500">Go to <code className="bg-slate-800 px-1 py-0.5 rounded text-xs">chrome://extensions</code>, toggle <strong>Developer mode</strong>, and click <strong>Load unpacked</strong>.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
 
         {/* Interactive Demo */}
         <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 shadow-2xl backdrop-blur-sm max-w-2xl mx-auto mb-16 relative group">
@@ -120,19 +156,36 @@ function App() {
               onClick={handleCopy}
               className="text-sm text-slate-400 hover:text-indigo-300 transition-colors flex items-center gap-2"
             >
-              {copied ? '✅ Copied!' : 'Click to copy text'}
+              {copied ? (
+                <>
+                  <CheckCircle2 className="w-4 h-4" />
+                  Copied!
+                </>
+              ) : 'Click to copy text'}
             </button>
           </div>
         </div>
 
         {/* CTA */}
         <div className="flex flex-col md:flex-row items-center justify-center gap-4">
-          <button className="px-8 py-4 bg-white text-slate-900 rounded-full font-bold text-lg hover:bg-slate-100 transform hover:scale-105 transition-all shadow-lg hover:shadow-xl w-full md:w-auto">
-            Download for Chrome
-          </button>
-          <button className="px-8 py-4 bg-slate-800 text-white rounded-full font-bold text-lg hover:bg-slate-700 border border-slate-700 w-full md:w-auto">
+          <a
+            href="https://github.com/Yann2808/flowtext"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-8 py-4 bg-white text-slate-900 rounded-full font-bold text-lg hover:bg-slate-100 transform hover:scale-105 transition-all shadow-lg hover:shadow-xl w-full md:w-auto flex items-center justify-center gap-3"
+          >
+            <Download className="w-6 h-6" />
+            Download v1.0 (GitHub)
+          </a>
+          <a
+            href="https://github.com/Yann2808/flowtext"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-8 py-4 bg-slate-800 text-white rounded-full font-bold text-lg hover:bg-slate-700 border border-slate-700 w-full md:w-auto flex items-center justify-center gap-2"
+          >
+            <Github className="w-5 h-5" />
             View Source Code
-          </button>
+          </a>
         </div>
 
       </main>
