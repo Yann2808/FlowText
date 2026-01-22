@@ -169,7 +169,7 @@ function App() {
         {/* CTA */}
         <div className="flex flex-col md:flex-row items-center justify-center gap-4">
           <a
-            href="https://github.com/Yann2808/flowtext"
+            href="https://github.com/Yann2808/flowtext/releases"
             target="_blank"
             rel="noopener noreferrer"
             className="px-8 py-4 bg-white text-slate-900 rounded-full font-bold text-lg hover:bg-slate-100 transform hover:scale-105 transition-all shadow-lg hover:shadow-xl w-full md:w-auto flex items-center justify-center gap-3"
